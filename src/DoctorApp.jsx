@@ -109,7 +109,7 @@ useEffect(() => {
       {reports.length === 0 ? (
           <p>No reports yet.</p>
         ) : (
-            reports.map((report,idx) => (
+            reports.map((report) => (
                 <div
                 key={report.id}
             style={{
@@ -121,7 +121,6 @@ useEffect(() => {
               boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
             }}
             >
-                <h2>Lab report #{idx +1 }</h2>
             <button
               onClick={() => handleDelete(report.id)}
               style={{
@@ -136,11 +135,10 @@ useEffect(() => {
             >
               Delete Report
             </button>
-        <h3>{report.patientName}</h3>
-
-
+        <h3>Patient name: {report.patientName}</h3>
 
             <p><strong>Date:</strong> {report.date}</p>
+            <p><strong>Pateint number:</strong> {report.patientNumber}</p>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               {orderedFields.map((field) => {
