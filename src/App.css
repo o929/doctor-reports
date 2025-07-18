@@ -6,6 +6,17 @@ body {
   font-size: 12.8px; /* approx 16 * 0.8 */
 }
 
+#nav {
+  background: #004691;
+  padding: 6px; /* 20 * 0.8 */
+  position: fixed;
+  top: 0;
+  left: 10px;
+  width: 100%;
+  color: white ;
+  z-index: 99999999999;
+  border-radius: 8px; /* 10 * 0.8 */
+}
 h2 {
   text-align: center;
   margin-bottom: 32px; /* 40 * 0.8 */
