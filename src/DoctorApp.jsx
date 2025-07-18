@@ -147,8 +147,10 @@ const filteredReports = reports.filter((report) =>
     borderRadius: "6px"
   }}
 />
-
+<br />
+<br />
       <h1>Doctor’s Reports</h1>
+      <br />
       {filteredReports.length > 0 &&
   filteredReports.every((r) => !r.wrapped) && (
     <button
