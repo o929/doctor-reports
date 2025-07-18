@@ -8,8 +8,8 @@ function App() {
     <>
      <Router>
        <nav id='nav'>
-          <Link to="/doctor" style={{color:"white",fontSize:"20px", marginRight: "1rem" }}>Lab Reports</Link>
-          <Link to="/chemec" style={{color:"white",fontSize:"20px"}}>Chemec Reports</Link>
+          <Link to="/doctor" style={{color:"white",fontSize:"18px", marginRight: "3rem" }}>Received Lab Reports</Link>
+          <Link to="/chemec" style={{color:"white",fontSize:"18px"}}>Reveived Chemec Reports</Link>
        </nav>
       
        <Routes>
