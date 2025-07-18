@@ -2,7 +2,7 @@ import { db } from "./fireBaseConfig";
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import './App.css';
-import { Camera, Heart, ChevronUp } from "lucide-react";
+import { ChevronUp ,ChevronDown} from "lucide-react";
 
 
 const urineGeneralFields = ["Color", "Reaction", "Sugar", ,"Acetone","Bile Pig"];
@@ -22,7 +22,8 @@ const DoctorReports = () => {
   const [reports, setReports] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
- 
+ const [searchTerm, setSearchTerm] = useState("");
+
 
 
   useEffect(() => {
@@ -42,40 +43,43 @@ const DoctorReports = () => {
     fetchReports();
     
   }, []);
+
 useEffect(() => {
   let isMounted = true;
 
   const fetchReports = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "labReports"));
+
       if (!isMounted) return;
 
-      const reportList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      // Get the saved wrapped values from localStorage
+      const localWrapped = JSON.parse(localStorage.getItem("activeReports")) || [];
+
+      const reportList = querySnapshot.docs.map((doc) => {
+        const saved = localWrapped.find((r) => r.id === doc.id);
+        return {
+          id: doc.id,
+          wrapped: saved?.wrapped || false,
+          ...doc.data(),
+        };
+      });
+
       setReports(reportList);
     } catch (error) {
       console.error("Error fetching reports:", error);
     }
   };
 
-  // Initial fetch
   fetchReports();
+  const intervalId = setInterval(fetchReports, 5000);
 
-  // Poll every 5 seconds
-  const intervalId = setInterval(() => {
-    fetchReports();
-  }, 3000);
-
-  // Cleanup on unmount
   return () => {
     isMounted = false;
     clearInterval(intervalId);
   };
 }, []);
 
-  
 
   const handleDelete = (id) => {
     setDeleteId(id);
@@ -102,6 +106,7 @@ useEffect(() => {
   const formatLabel = (field) =>
     field.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
 
+// Toggle the wrapped state of a report
 const toggleWrap = (id) => {
   const updated = reports.map((r) =>
     r.id === id ? { ...r, wrapped: !r.wrapped } : r
@@ -110,16 +115,65 @@ const toggleWrap = (id) => {
   localStorage.setItem("activeReports", JSON.stringify(updated));
 };
 
+//wrap all reports
+const wrapAll = () => {
+  const updated = reports.map((r) => ({ ...r, wrapped: true }));
+  setReports(updated);
+  localStorage.setItem("activeReports", JSON.stringify(updated));
+};
+
+
+// Filter reports based on the search term
+const filteredReports = reports.filter((report) =>
+  report.patientName?.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   return (
       <div id="labReportsContainer" style={{  width: "300%", padding: "10px" }}>
-      <h1>Doctor’s Reports</h1>
+        <input
+  type="text"
+  placeholder="Search by patient name"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  style={{
+    top:"50px",
+    marginBottom: "10px",
+    position: "absolute",
+    padding: "10px",
+    width: "100%",
+    maxWidth: "400px",
+    fontSize: "16px",
+    border: "1px solid #ccc",
+    borderRadius: "6px"
+  }}
+/>
 
-      { reports.length === 0 ? (
+      <h1>Doctor’s Reports</h1>
+      {filteredReports.length > 0 &&
+  filteredReports.every((r) => !r.wrapped) && (
+    <button
+      onClick={wrapAll}
+      style={{
+        marginBottom: "20px",
+        backgroundColor: "#007bff",
+        color: "white",
+        border: "none",
+        padding: "10px 16px",
+        borderRadius: "6px",
+        fontSize: "16px",
+        cursor: "pointer",
+      }}
+    >
+      Wrap All
+    </button>
+  )}
+
+
+      { filteredReports.length === 0 ? (
           <p>No reports yet.</p>
         ) : (
           
-            reports.map((report) => (
+            filteredReports.map((report) => (
               
                 <div
                 key={report.id}
@@ -151,9 +205,24 @@ className={`report-box ${report.wrapped ? "collapsed" : "expanded"}`}
     padding: 4
   }}
 >
-  {report.wrapped ? <ChevronDown size={28} /> : <ChevronUp size={28} />}
+
 </button> */}
 
+<button
+  onClick={() => toggleWrap(report.id)}
+  aria-label={report.wrapped ? "Expand report" : "Collapse report"}
+  style={{
+    backgroundColor: "#007bff",
+    color: "white",
+    border: "none",
+    padding: "2px 10px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginLeft: "100px",
+  }}
+>
+  {report.wrapped ? <ChevronDown size={28} /> : <ChevronUp size={28} />}
+</button>
 
         <h3>Patient name: {report.patientName}</h3>
 

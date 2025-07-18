@@ -30,7 +30,7 @@ h2 {
 }
 
 .report-box.collapsed {
-  /* max-height: 80px;   Show the first line or two */
+  max-height: 80px; 
   /* overflow: hidden; */
   opacity: 0.6;
   cursor: pointer;
@@ -38,7 +38,7 @@ h2 {
 }
 
 .report-box.expanded {
-  /* max-height: 5000px; Big enough to show full content */
+   max-height: 5000px;  
   opacity: 1;
   transition: all 0.3s ease-in-out;
 }
