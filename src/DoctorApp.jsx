@@ -2,19 +2,20 @@ import { db } from "./fireBaseConfig";
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import './App.css';
+import { Camera, Heart, ChevronUp } from "lucide-react";
 
-const urineGeneralFields = ["urineColour", "urineReaction", "urineSugar", "urineAlbumin"];
-const stoolGeneralFields = ["stoolColour", "stoolConsistency", "stoolMucous", "stoolBlood", "stoolWorms"];
+
+const urineGeneralFields = ["Color", "Reaction", "Sugar", ,"Acetone","Bile Pig"];
+const stoolGeneralFields = ["Colour", "Consistency", "Mucous", "Blood", "Worms"];
+const depositsFeilds = ["d.Pus", "d.R.B.Cs", "E.P cels", "Casts", "Crystalis","Undingeste Ova","Trichomans V","Yeast","Others"];
+const microscopicFeilds = ["Pus", "R.B.Cs", "Cysts/Ova", "Flagllates", "Trophozoite","Undingeste Food","Others"];
 
 const orderedFields = [
-  "patientName", "date", "sign", "bfMalaria", "ictMalaria", "hb", "twbc", "esr", "rf",
-  "aso", "rbs", "fbs", "hpp", "hcg", "abo", "rh", "hiv", "hbv", "hcv", "urea",
-  "creatinine", "urineColour", "urineReaction", "urineSugar", "urineAlbumin",
-  "urinePusCells", "urineRBCs", "urineEPCs", "urineCasts", "urineCrystals",
-  "urineOva", "urineTrichomonas", "urineYeast", "urineOthers", "stoolColour",
-  "stoolConsistency", "stoolMucous", "stoolBlood", "stoolWorms",
-  "stoolPusCells", "stoolRBCs", "stoolCystOva", "stoolFlagellates",
-  "stoolTrophozoite", "stoolUndigestedFood", "stoolOthers", "sentAt"
+  "patientNumber", "patientName", "date", "sign",
+  "bfMalaria", "ictMalaria", "hb", "twbc", "esr", "rf",
+  "aso", "rbs", "fbs", "hpp", "hcg", "bg", "abo", "rh",
+  "widalBo", "widalO", "widalC", "widalH", "widalBruc",
+  "hiv", "hbv", "hcv", "ictHpaab", "urea", "creatinine",
 ];
 
 const DoctorReports = () => {
@@ -101,25 +102,30 @@ useEffect(() => {
   const formatLabel = (field) =>
     field.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
 
+const toggleWrap = (id) => {
+  const updated = reports.map((r) =>
+    r.id === id ? { ...r, wrapped: !r.wrapped } : r
+  );
+  setReports(updated);
+  localStorage.setItem("activeReports", JSON.stringify(updated));
+};
+
 
   return (
       <div id="labReportsContainer" style={{  width: "300%", padding: "10px" }}>
       <h1>Doctor’s Reports</h1>
 
-      {reports.length === 0 ? (
+      { reports.length === 0 ? (
           <p>No reports yet.</p>
         ) : (
+          
             reports.map((report) => (
+              
                 <div
                 key={report.id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "15px",
-              marginBottom: "20px",
-              borderRadius: "8px",
-              backgroundColor: "#f9f9f9",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            }}
+        id={`report-${report.id}`}
+className={`report-box ${report.wrapped ? "collapsed" : "expanded"}`}
+
             >
             <button
               onClick={() => handleDelete(report.id)}
@@ -135,6 +141,20 @@ useEffect(() => {
             >
               Delete Report
             </button>
+{/* <button
+  onClick={() => toggleWrap(report.id)}
+  aria-label={report.wrapped ? "Expand report" : "Collapse report"}
+  style={{
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: 4
+  }}
+>
+  {report.wrapped ? <ChevronDown size={28} /> : <ChevronUp size={28} />}
+</button> */}
+
+
         <h3>Patient name: {report.patientName}</h3>
 
             <p><strong>Date:</strong> {report.date}</p>
@@ -145,7 +165,9 @@ useEffect(() => {
                   if (
                       ["patientName", "date", "sentAt"].includes(field) ||
                   urineGeneralFields.includes(field) ||
-                  stoolGeneralFields.includes(field)
+                  stoolGeneralFields.includes(field) ||
+                  depositsFeilds.includes(field) ||
+                  microscopicFeilds.includes(field) 
                 )
                   return null;
                   
@@ -176,6 +198,26 @@ useEffect(() => {
                 </div>
               ))}
             </div>
+
+                 <div className="box stool-box">
+              <h4>Deposits</h4>
+              {depositsFeilds.map((field) => (
+                  <div key={field} className="section">
+                  <strong>{formatLabel(field)}:</strong> {String(report[field]) || <em>empty</em>}
+                </div>
+              ))}
+            </div>
+
+
+     <div className="box stool-box">
+              <h4>Microscopic</h4>
+              {microscopicFeilds.map((field) => (
+                  <div key={field} className="section">
+                  <strong>{formatLabel(field)}:</strong> {String(report[field]) || <em>empty</em>}
+                </div>
+              ))}
+            </div>
+
 
             {report.sentAt && (
                 <p>

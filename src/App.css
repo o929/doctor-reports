@@ -15,9 +15,34 @@ h2 {
 }
 
 #labReportsContainer {
-  width: 360% !important;
-  background-color: rgb(255, 255, 255);
+  width: 200% !important;
+  /* background-color: rgb(235, 0, 0); */
 }
+.report-box {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.report-box.collapsed {
+  /* max-height: 80px;   Show the first line or two */
+  /* overflow: hidden; */
+  opacity: 0.6;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.report-box.expanded {
+  /* max-height: 5000px; Big enough to show full content */
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+
 
 .lab-form {
   background: white;
